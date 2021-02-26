@@ -1,4 +1,5 @@
-from flask import Flask, jsonify
+from app import app
+from flask import jsonify
 
 DB = [
         {
@@ -15,8 +16,6 @@ DB = [
         }
     ]
 
-
-app = Flask(__name__)
 
 @app.route("/")
 def index():
