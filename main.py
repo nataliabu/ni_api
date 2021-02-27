@@ -3,7 +3,7 @@ from flask import jsonify
 
 @app.route("/")
 def index():
-    return "Hello NI!"
+    return jsonify("Hello NI!")
 
 @app.route("/keys", methods=["GET"])
 def get_all_keys_and_values():
