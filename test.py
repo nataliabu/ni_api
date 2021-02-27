@@ -73,5 +73,21 @@ class TestDeleteAll(NITestCase):
         self.assertEqual(response.json, [])
 
 
+class TestDeleteValue(NITestCase):
+
+    def test_delete_value_existent(self):
+        self.fixtures()
+        response = self.client.delete("/keys/key1")
+        self.assertEqual(response.json, "Database entry succesfully deleted")
+        self.assert200(response)
+        response = self.client.get("/keys")
+        self.assertEqual(response.json, [{"key2": "bar"}])
+
+    def test_delete_value_unexistent(self):
+        response = self.client.delete("/keys/key1")
+        self.assertEqual(response.json, "Not Found")
+        self.assert404(response)
+
+
 if __name__ == '__main__':
     unittest.main()
