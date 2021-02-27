@@ -1,21 +1,5 @@
-from app import app
+from app import app, db, DataTable
 from flask import jsonify
-
-DB = [
-        {
-            "id": 1,
-            "val": "foo"
-        },
-        {
-            "id": 2,
-            "val": "bar"
-        },
-        {
-            "id": 3,
-            "val": "baz"
-        }
-    ]
-
 
 @app.route("/")
 def index():
@@ -23,22 +7,23 @@ def index():
 
 @app.route("/keys", methods=["GET"])
 def get_all_keys_and_values():
-    return jsonify(DB)
+    results = []
+    for row in DataTable.query.all():
+        results.append({row.key: row.value})
+    return jsonify(results)
 
-@app.route("/keys/<int:id>", methods=["GET"])
+@app.route("/keys/<string:id>", methods=["GET"])
 def get_value(id):
-    result = {}
-    for elem in DB:
-        if elem["id"] == id:
-            result = jsonify(elem["val"])
-            #result = jsonify({"elem": elem})
-    return result
+    row = DataTable.query.filter(DataTable.key == id).first()
+    if row is not None:
+        return jsonify(row.value)
+    return jsonify("Not Found"), 404
 
 @app.route("/keys", methods=["DELETE"])
 def delete_all_values():
-    for elem in DB:
-        elem["val"] = None
-    return jsonify(DB)
+    db.session.query(DataTable).delete()
+    db.session.commit()
+    return jsonify("Deleting all database entries")
 
 if __name__ == "__main__":
     app.run()
