@@ -89,5 +89,17 @@ class TestDeleteValue(NITestCase):
         self.assert404(response)
 
 
+class TestCheckValue(NITestCase):
+
+    def test_check_value_existent(self):
+        self.fixtures()
+        response = self.client.head("/keys/key1")
+        self.assert200(response)
+
+    def test_check_value_unexistent(self):
+        response = self.client.head("/keys/key1")
+        self.assert404(response)
+
+
 if __name__ == '__main__':
     unittest.main()
