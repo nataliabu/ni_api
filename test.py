@@ -2,6 +2,7 @@ from flask import Flask
 from flask_testing import TestCase
 import unittest
 import main
+import json
 
 # Child of TestCase and Parent to all Test Clases
 class NITestCase(TestCase):
@@ -99,6 +100,70 @@ class TestCheckValue(NITestCase):
     def test_check_value_unexistent(self):
         response = self.client.head("/keys/key1")
         self.assert404(response)
+
+
+class SetValue(NITestCase):
+    my_data = {"key1": "baz"}
+    my_headers = {'content-type': 'application/json'}
+
+    def test_set_new_key_value(self):
+        response = self.client.put(
+                "/keys",
+                data=json.dumps(self.my_data),
+                headers=self.my_headers
+                )
+        self.assert200(response)
+        self.assertEqual(response.json, "Setting value")
+        response = self.client.get("/keys/key1")
+        self.assertEqual(response.json, "baz")
+
+    def test_set_existing_key_new_value(self):
+        self.fixtures()
+        response = self.client.get("/keys/key1")
+        self.assertEqual(response.json, "foo")
+        response = self.client.put(
+                "/keys",
+                data=json.dumps(self.my_data),
+                headers=self.my_headers
+                )
+        self.assert200(response)
+        self.assertEqual(response.json, "Setting value")
+        response = self.client.get("/keys/key1")
+        self.assertEqual(response.json, "baz")
+
+    def test_set_no_json_content_type(self):
+        response = self.client.put(
+                "/keys",
+                data=json.dumps(self.my_data)
+                )
+        self.assert400(response)
+        self.assertEqual(response.json, "json expected as Content-Type")
+        response = self.client.get("/keys")
+        self.assertEqual(response.json, [])
+
+    def test_set_no_dict(self):
+        response = self.client.put(
+                "/keys",
+                data=json.dumps("I am not a dict"),
+                headers=self.my_headers
+                )
+        self.assert400(response)
+        self.assertEqual(response.json,
+                "Expected a dictionary with a string as a key and a string as its value")
+        response = self.client.get("/keys")
+        self.assertEqual(response.json, [])
+
+    def test_set_val_is_not_str(self):
+        response = self.client.put(
+                "/keys",
+                data=json.dumps({"key1": [1, 2, 3]}),
+                headers=self.my_headers
+                )
+        self.assert400(response)
+        self.assertEqual(response.json,
+                "Expected a dictionary with a string as a key and a string as its value")
+        response = self.client.get("/keys")
+        self.assertEqual(response.json, [])
 
 
 if __name__ == '__main__':

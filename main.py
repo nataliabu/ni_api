@@ -1,5 +1,5 @@
 from app import app, db, DataTable
-from flask import jsonify
+from flask import jsonify, request
 
 @app.route("/")
 def index():
@@ -33,6 +33,28 @@ def delete_value(id):
     db.session.delete(entry)
     db.session.commit()
     return jsonify("Database entry succesfully deleted")
+
+@app.route("/keys", methods=["PUT"])
+def put_value():
+    entry_request = request.get_json()
+    if entry_request is None:
+        return jsonify("json expected as Content-Type"), 400
+    elif type(entry_request) != dict:
+        return jsonify("Expected a dictionary with a string as a key and a string as its value"), 400
+    for request_key, request_value in entry_request.items():
+        existent_key = DataTable.query.filter(DataTable.key == request_key).first()
+        if existent_key is not None:
+            existent_key.value = request_value
+        else:
+            new = DataTable(key = request_key, value = request_value)
+            db.session.add(new)
+    try:
+        db.session.commit()
+        return jsonify("Setting value")
+    except Exception:
+        db.session.rollback()
+        return jsonify("Expected a dictionary with a string as a key and a string as its value"), 400
+
 
 if __name__ == "__main__":
     app.run()
