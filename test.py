@@ -4,6 +4,7 @@ import unittest
 import main
 import json
 
+
 # Child of TestCase and Parent to all Test Clases
 class NITestCase(TestCase):
 
@@ -23,8 +24,8 @@ class NITestCase(TestCase):
 
     # Populates the testing database
     def fixtures(self):
-        obj1 = main.DataTable(key = "key1", value = "foo")
-        obj2 = main.DataTable(key = "key2", value = "bar")
+        obj1 = main.DataTable(key="key1", value="foo")
+        obj2 = main.DataTable(key="key2", value="bar")
         main.db.session.add(obj1)
         main.db.session.add(obj2)
         main.db.session.commit()
@@ -79,7 +80,7 @@ class TestDeleteValue(NITestCase):
     def test_delete_value_existent(self):
         self.fixtures()
         response = self.client.delete("/keys/key1")
-        self.assertEqual(response.json, "Database entry succesfully deleted")
+        self.assertEqual(response.json, "Deleting database entry")
         self.assert200(response)
         response = self.client.get("/keys")
         self.assertEqual(response.json, [{"key2": "bar"}])
@@ -148,8 +149,9 @@ class SetValue(NITestCase):
                 headers=self.my_headers
                 )
         self.assert400(response)
-        self.assertEqual(response.json,
-                "Expected a dictionary with a string as a key and a string as its value")
+        self.assertEqual(response.json, ("Expected a dictionary with "
+                                         "a string as a key and a string "
+                                         "as its value"))
         response = self.client.get("/keys")
         self.assertEqual(response.json, [])
 
@@ -160,8 +162,9 @@ class SetValue(NITestCase):
                 headers=self.my_headers
                 )
         self.assert400(response)
-        self.assertEqual(response.json,
-                "Expected a dictionary with a string as a key and a string as its value")
+        self.assertEqual(response.json, ("Expected a dictionary with "
+                                         "a string as a key and a string "
+                                         "as its value"))
         response = self.client.get("/keys")
         self.assertEqual(response.json, [])
 
