@@ -50,6 +50,19 @@ class TestGetAll(NITestCase):
         self.assertEqual(response.json, [{"key1": "foo"}, {"key2": "bar"}])
 
 
+class TestGetWithFilter(NITestCase):
+
+    def test_valid_filter(self):
+        self.fixtures()
+        response = self.client.get("/keys?filter=2")
+        self.assertEqual(response.json, [{"key2": "bar"}])
+
+    def test_invalid_filter(self):
+        self.fixtures()
+        response = self.client.get("/keys?filter=3")
+        self.assertEqual(response.json, [])
+
+
 class TestGetValue(NITestCase):
 
     def test_value_existent(self):

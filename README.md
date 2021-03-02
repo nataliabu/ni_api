@@ -81,14 +81,20 @@ In the terminal, run:
 ```
 curl -X DELETE http://127.0.0.1:5000/keys
 ```
+### Support wildcard keys when getting all values (GET /keys?filter=wo$d)
 
+In the terminal, run (replacing wo$d with the characters you want to filter by):
+```
+curl http://127.0.0.1:5000/keys?filter=wo$d
+```
 
 ## Implementation decisions: possibilities and limitations
 
 ### Deleting
 
-In the assingment it is specified to "delete a value" and "delete all values".  
-If taken literally, the program would delete only the value(s), not deleting their   corresponding keys.  
+In the assignment it is specified to "delete a value" and "delete all values".  
+If taken literally, the program would delete only the value(s), not deleting their  
+corresponding keys.  
 However, the more common usage in these sort of deletions in APIs and is to remove  
 completely the whole data entry. This later approach has been the one taken.  
 
@@ -100,8 +106,10 @@ This means that an extra implementation of HEAD is not necessary
 ### Setting
 
 #### Use cases
-This programs accepts to set new key-pair values and to update already existent  
-data entries.
+This functionality allows the user to:
+* set new key-pair values
+* update already existent data entries.
+
 If an already existent key is given when setting a key-value pair, the data entry will be   
 updated and the old value overwritten with the new value.
 
@@ -124,7 +132,7 @@ data types. For now if another datatype would be needed in value, as in:
 ```
 {"some_numbers": [1, 3, 7])}
 ```   
-the user would have to *stringy* the value as in   
+the user would have to *stringify* the value as in:  
 ```
 {"some_numbers": "[1, 3, 7]")}
 ```
@@ -134,35 +142,41 @@ This implementation accepts setting key-value pairs with special characters (suc
 but curl might not display them as expected(***TRUE? HOW CAN I CHECK THIS?***). 
 
 
-### A note on endoint implementation
+### A note on endpoint implementation
 
 Sometimes one endpoint requires different methods.  
 In some existing implementations of APIs, these methods are assigned in the same line, and   
-handled inside the function with conditionals.  
-In this implementation it was prefered to have one function per method per endpoint   
-whenever possible, as it makes the code more understandable, maintainable and extendable.   
-Additionally, the implementation of the testing of each functionality can keep the same   
-structure as their implementation, making it also more clear and easier to maintain.  
+handled inside one function with conditionals.  
+In this implementation it was preferred to have one function per method per endpoint  
+whenever possible, as it makes the code more understandable, maintainable and extendable.  
 
 
 ## Tests
+
+The automated tests of all functionalities keep a similar  
+structure as their implementation: one class per method per endpoint,
+making it also more clear and easier to maintain.
 
 The tests for all implemented functionalities can be found in
 ```
 test.py
 ```
 
+### Tests implementation
+
+Since the tests needed
+
 ## Possible improvements
 
 ### Database
-SQLite is used in this implementation because it is good enough for this project and   
-because of ease of use in development. However, in a production context it would have   
-to be changed to PostgreSQL or similar.
+SQLite is used in this implementation because it is good enough for this project and  
+because of ease of use with SQLAlchemy in development. However, in a production context  
+it would have to be changed to PostgreSQL or similar.
 
-#### Personal thoughts on PUT vs. POST
+### Personal thoughts on PUT vs. POST
 
 The functionality has been implemented as asked, but I would like to understand  
-better the decissions behind having the endpoint /keys for setting a value with  
+better the decisions behind having the endpoint /keys for setting a value with  
 PUT.  
 In the context of this API and the endpoints asked, I would have implemented to   
 * Set a new key:value pair (POST /keys)
@@ -172,7 +186,7 @@ In the context of this API and the endpoints asked, I would have implemented to
 HTTP/1.1 (9.6),](https://www.ietf.org/rfc/rfc2068.txt) I would be curious to  
 understand better your point of view on this).  
 
-## Git (spoilers!)
+### Git (spoilers!)
 I didn't put (actively) any personal info, but I still appear as author of my  
 git commits.  
 If you would like to stay unbiased, but want to check my git commits, I  
@@ -186,10 +200,12 @@ git log --oneline
 In a production context I would try to make this API secure and protected by  
 implementing authentication and authorisation.
 
-## Missing Implementations
+### Missing Implementations
 
 I didn't have enough time to implement:
 
 * Set an expiry time when adding a value (PUT /keys?expire_in=60)
-* Support wildcard keys when getting all values (GET /keys?filter=wo$d)
+
+I also didn’t have the time to learn how to provide an integration with a monitoring solution,  
+but I am keen on learning!
 

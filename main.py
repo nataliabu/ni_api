@@ -8,10 +8,16 @@ def index():
 
 
 @app.route("/keys", methods=["GET"])
-def get_all_keys_and_values():
+def get_all_and_filter():
     results = []
-    for row in DataTable.query.all():
-        results.append({row.key: row.value})
+    if "filter" in request.args:
+        filt = str(request.args["filter"])
+        filtered_keys = DataTable.key.like("%"+filt+"%")
+        for row in DataTable.query.filter(filtered_keys).all():
+            results.append({row.key: row.value})
+    else:
+        for row in DataTable.query.all():
+            results.append({row.key: row.value})
     return jsonify(results)
 
 
