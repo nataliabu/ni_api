@@ -139,7 +139,7 @@ the user would have to *stringify* the value as in:
 
 #### Character encoding
 This implementation accepts setting key-value pairs with special characters (such as ä, ö, ü),   
-but curl might not display them as expected(***TRUE? HOW CAN I CHECK THIS?***). 
+but curl might not display them as expected.
 
 
 ### A note on endpoint implementation
@@ -161,10 +161,6 @@ The tests for all implemented functionalities can be found in
 ```
 test.py
 ```
-
-### Tests implementation
-
-Since the tests needed
 
 ## Possible improvements
 
