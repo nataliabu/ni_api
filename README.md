@@ -181,6 +181,11 @@ the user would have to *stringify* the value as in:
 This implementation accepts setting key-value pairs with special characters (such as ä, ö, ü).
 At th moment this is being saved correctly in the database, but curl might not display them as expected.
 
+#### Code structure
+I would like to refactor the code of the PUT functionality so it hase a more
+clear and clean structure. I would probably create functions for the code that
+takes care of saving new data entries and updating existing data enries.
+
 ### A note on endpoint implementation
 
 Sometimes one endpoint requires different methods.
