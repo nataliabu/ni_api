@@ -21,7 +21,7 @@ The technical stack used is:
 In the terminal, run:
 
 ```
-python3.8 venv venv
+python3.8 -m venv venv # Requires the python venv package
 source venv/bin/activate
 pip install -r requirements.txt
 python db_initialisation.py
@@ -59,7 +59,7 @@ In the terminal, run:
 
 ```
 curl --header "Content-Type: application/json" \
-	I—request PUT \
+	--request PUT \
 	--data '{"my_key": "my_value"}' http://127.0.0.1:5000/keys
 ```
 
@@ -101,7 +101,7 @@ In the terminal, run:
 
 ```
 curl --header "Content-Type: application/json" \
-	I—request PUT \
+	--request PUT \
 	--data '{"my_key": "my_value"}' http://127.0.0.1:5000/keys?expire_in=60
 ```
 (Or replacing the 60 at the end with another positive integer)
