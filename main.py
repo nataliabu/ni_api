@@ -1,5 +1,6 @@
 from app import app, db, DataTable
 from flask import jsonify, request
+from datetime import datetime, timedelta
 
 
 @app.route("/")
@@ -54,23 +55,47 @@ def delete_value(id):
 @app.route("/keys", methods=["PUT"])
 def put_value():
     entry_request = request.get_json()
+
     if entry_request is None:
         return jsonify("json expected as Content-Type"), 400
+
     elif type(entry_request) != dict:
         return jsonify("Expected a dictionary with a string as a key and "
                        "a string as its value"), 400
+
+    # Prepares the request to be saved
     for request_key, request_value in entry_request.items():
         existent_key = DataTable.query.filter(
                 DataTable.key == request_key
                 ).first()
+
+        # Updates an already existing data entry
         if existent_key is not None:
             existent_key.value = request_value
+
+        # Sets a new data entry
         else:
-            new = DataTable(key=request_key, value=request_value)
+
+            # New data entry with expiry date
+            if "expire_in" in request.args:
+                seconds_input = int(request.args["expire_in"])
+                time_delta = timedelta(seconds=seconds_input)
+                expiry_time = str(time_delta + datetime.now())
+                new = DataTable(key=request_key,
+                                value=request_value,
+                                expiry=expiry_time)
+
+            # New data entry without expiry date
+            else:
+                new = DataTable(key=request_key, value=request_value)
+            # Add to database
             db.session.add(new)
+
     try:
         db.session.commit()
         return jsonify("Setting value")
+
+    # When value is not a string
     except Exception:
         db.session.rollback()
         return jsonify("Expected a dictionary with a string as a key and "

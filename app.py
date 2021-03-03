@@ -12,3 +12,4 @@ class DataTable(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     key = db.Column(db.String, index=True, unique=True)
     value = db.Column(db.String)
+    expiry = db.Column(db.String, nullable=True)

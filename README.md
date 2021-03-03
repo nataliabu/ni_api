@@ -96,6 +96,15 @@ In the terminal, run:
 ```
 curl -X DELETE http://127.0.0.1:5000/keys
 ```
+### Set an expiry time when adding a value (PUT /keys?expire_in=60)
+In the terminal, run:
+
+```
+curl --header "Content-Type: application/json" \
+	I—request PUT \
+	--data '{"my_key": "my_value"}' http://127.0.0.1:5000/keys?expire_in=60
+```
+(Or replacing the 60 at the end with another positive integer)
 ### Support wildcard keys when getting all values (GET /keys?filter=wo$d)
 
 In the terminal, run (replacing wo$d with the characters you want to filter by):
@@ -104,11 +113,22 @@ curl http://127.0.0.1:5000/keys?filter=wo$d
 ```
 ### Tests
 
-The tests for all implemented functionalities can be run with:
+The tests can be run with:
 ```
 python test.py
 ```
 ## Implementation decisions: possibilities and limitations
+
+### Getting
+
+The user can see all keys and values in the database, or a specific value from a
+key provided by the user.
+
+At the moment this includes also those cases where the data entries have
+expired.
+In a future version, the program would check for the 'expiry' field in the
+database and would let the user know when a data entry that they
+are trying to get has expired. (Tests for this would also be implemented).
 
 ### Deleting
 
@@ -127,11 +147,24 @@ This means that an extra implementation of HEAD is not necessary.
 
 #### Use cases
 This functionality allows the user to:
-* set new key-pair values
+* set one or more new key-value pairs without expiry
+* set one key-value pair with expiry
 * update already existent data entries.
 
-If an already existent key is given when setting a key-value pair, the data entry will be
+If an already existent key is given when setting a key-value pair (without expiry), the data entry will be
 updated and the old value overwritten with the new value.
+
+With more time I would expand the use cases to be more flexible. New versions
+could allow the user to:
+* set several key-value pairs with expiry
+* update the expiry of an already existent data entry
+
+I didn't have enough time to write the tests for the expiry functionality.
+These would test that the functionality is working as expected when given a
+correct input by the user, but also some edge cases like:
+* negative integer
+* float
+* string of letters, among others.
 
 #### Data type limitations
 This implementation only accepts strings as values. If I had more time, I would improve it to accept other
@@ -145,9 +178,8 @@ the user would have to *stringify* the value as in:
 ```
 
 #### Character encoding
-This implementation accepts setting key-value pairs with special characters (such as ä, ö, ü),
-but curl might not display them as expected.
-
+This implementation accepts setting key-value pairs with special characters (such as ä, ö, ü).
+At th moment this is being saved correctly in the database, but curl might not display them as expected.
 
 ### A note on endpoint implementation
 
@@ -160,7 +192,7 @@ as it makes the code more understandable, maintainable and extendable.
 
 ## Tests implementation
 
-The automated tests of all functionalities keep a similar structure as their implementation:
+The automated tests of the functionalities keep a similar structure as their implementation:
 one class per method per endpoint. Keeping this structure makes the tests script more clear
 and easier to maintain.
 
@@ -170,6 +202,9 @@ and easier to maintain.
 SQLite is used in this implementation because it is good enough for this project and
 because of ease of use with SQLAlchemy in development. However, in a production context
 it would have to be changed to PostgreSQL or similar.
+SQLAlchemy supports a DateTime type (for datetime.datetime() Python objects),
+but SQLite doesn't. The 'expiry' column is saved as a string at the moment.
+This could be improved once the migration to PostgresSQL is done.
 
 ### Personal thoughts on PUT vs. POST
 
@@ -198,12 +233,7 @@ git log --oneline
 In a production context I would try to make this API secure and protected by
 implementing authentication and authorisation.
 
-### Missing Implementations
+### Infrastructure
 
-I didn't have enough time to implement:
-
-* Set an expiry time when adding a value (PUT /keys?expire_in=60)
-
-I also didn’t have the time to learn how to provide an integration with a monitoring solution,
-but I am keen on learning!
-
+I didn't provide a Docker Compose file and I didn’t have the time to learn how
+to provide an integration with a monitoring solution, but I am keen on learning!
